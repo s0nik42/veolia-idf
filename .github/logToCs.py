@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# pylint: disable=invalid-name
 """
 Convert a log to CheckStyle format.
 
@@ -48,10 +49,13 @@ License: MIT License
 import argparse
 import re
 import sys
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ET  # nosec
 
 
 def convert_to_checkstyle(messages):
+    """
+    Convert provided message to CheckStyle format.
+    """
     root = ET.Element("checkstyle")
     for message in messages:
         fields = parse_message(message)
@@ -115,10 +119,10 @@ def parse_message(message):
     Returns the fields in a dict.
     """
     for pattern in PATTERNS:
-        m = pattern.match(message)
-        if not m:
+        fields = pattern.match(message)
+        if not fields:
             continue
-        result = m.groupdict()
+        result = fields.groupdict()
         if len(result) == 0:
             continue
 
@@ -159,6 +163,9 @@ def add_error_entry(  # pylint: disable=too-many-arguments
     message=None,
     source=None,
 ):
+    """
+    Add error information to the CheckStyle output being created.
+    """
     file_element = find_or_create_file_element(root, file_name)
     error_element = ET.SubElement(file_element, "error")
     error_element.set("severity", severity)
@@ -174,6 +181,9 @@ def add_error_entry(  # pylint: disable=too-many-arguments
 
 
 def find_or_create_file_element(root, file_name):
+    """
+    Find/create file element in XML document tree.
+    """
     for file_element in root.findall("file"):
         if file_element.get("name") == file_name:
             return file_element
@@ -183,6 +193,9 @@ def find_or_create_file_element(root, file_name):
 
 
 def main():
+    """
+    Parse the script arguments and get the conversion done.
+    """
     parser = argparse.ArgumentParser(
         description="Convert messages to Checkstyle XML format."
     )
