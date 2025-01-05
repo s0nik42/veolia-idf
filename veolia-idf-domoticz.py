@@ -52,6 +52,7 @@ try:
     from selenium.webdriver.firefox.service import Service as FirefoxService
     from selenium.webdriver.support import expected_conditions as EC
     from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.chrome.service import Service
 except ImportError as exc:
     print(
         "Error: failed to import python required module : " + str(exc),
@@ -407,8 +408,9 @@ class VeoliaCrawler:
             "Start the browser", end=""
         )  #############################################################
         try:
+            service = Service(executable_path=self.configuration["chromedriver"])
             self.__browser = webdriver.Chrome(
-                executable_path=self.configuration["chromedriver"],
+                service=service,
                 options=options,
             )
             self.__browser.maximize_window()
