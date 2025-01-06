@@ -686,14 +686,14 @@ class VeoliaCrawler:
         self.wait_until_disappeared(By.CSS_SELECTOR, "lightning-spinner")
         time.sleep(1)
 
-        ### COMPORTEMENT DIFFERENT S'IL S AGIT D'UN MULTU CONTRATS
+        ### COMPORTEMENT DIFFERENT S'IL S AGIT D'UN MULTI CONTRATS
         ### OU D'UN CONTRAT UNIQUE (CLICK DIRECTEMENT SUR HISTORIQUE)
 
         self.print("Wait for MENU contrats or historique", end="")
         ep = EC.visibility_of_element_located(
             (
                 By.XPATH,
-                "//span[contains(text(), 'CONTRATS') or contains(text(), 'HISTORIQUE')]",
+                "//span[contains(text(), 'Contrats') or contains(text(), 'Historique')]",
             )
         )
         el = self.__wait.until(
@@ -716,13 +716,14 @@ class VeoliaCrawler:
         self.print(st="ok")
 
         # GESTION DU PARCOURS MULTICONTRATS
-        if menu_type == "CONTRATS":
+        if menu_type == "Contrats":
             time.sleep(2)
             self.click_in_view(
-                By.LINK_TEXT,
-                str(self.configuration["veolia_contract"]),
-                wait_message="Select contract : %s"
-                % (str(self.configuration["veolia_contract"]),),
+                By.XPATH,
+                r"//div[@class='fra-contrat-table-row']//span[contains(@class, 'link')]/a[text()='"
+                + str(self.configuration["veolia_contract"])
+                + r"']",
+                wait_message="Select contract : %s" % (str(self.configuration["veolia_contract"]),),
                 click_message="Click on contract",
                 delay=0,
             )
@@ -731,8 +732,9 @@ class VeoliaCrawler:
 
         ###### Click Historique #####
         self.click_in_view(
-            By.LINK_TEXT,
-            "Historique",
+            By.XPATH,
+            r"//*[(self::a and text()='Historique')"
+            r" or (self::span and contains(text(), 'Historique'))]",
             wait_message="Wait for historique menu",
             click_message="Click on historique menu",
             delay=4,
@@ -1073,7 +1075,7 @@ class DomoticzInjector:
                     # Verify data integrity :
                     d1 = datetime.strptime(date, "%Y-%m-%d")
                     d2 = datetime.now()
-                    if abs((d2 - d1).days) > 300:
+                    if abs((d2 - d1).days) > 30:
                         raise RuntimeError(
                             "File contains too old data (monthly?!?): "
                             + str(row)
